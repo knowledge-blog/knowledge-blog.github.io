@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Github Pages on nannannan</title>
+    <link>https://3nan3.github.io/tags/github-pages/</link>
+    <description>Recent content in Github Pages on nannannan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 24 Nov 2019 19:28:29 +0900</lastBuildDate>
+    
+	<atom:link href="https://3nan3.github.io/tags/github-pages/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GitHub Pages と Hugo でブログを書く</title>
+      <link>https://3nan3.github.io/post/2019112401_github_pages_and_hugo/</link>
+      <pubDate>Sun, 24 Nov 2019 19:28:29 +0900</pubDate>
+      
+      <guid>https://3nan3.github.io/post/2019112401_github_pages_and_hugo/</guid>
+      <description>はじめに 今までブログとか持ってなかったので何か欲しかったんですよね。
+ブログサービスとか色々あるんですけど、GitHubに静的なページおいて公開できる機能あったことを思い出して使ってみることにしました。
+今回は、そのビルドログということで記録を残しておきます。
+ブログなので文量多めです。
+GitHub Pages とは 簡単に言うと、GitHubに &amp;lt;username&amp;gt;.github.io という名前のレポジトリを作ると、Webページとして公開してくれるサービスです。 構成とかデプロイとか何にも考えなくて良いので楽ちん。
+https://help.github.com/ja/github/working-with-github-pages
+商用利用禁止であったり、アクセス数の制限があったり、その辺りの細かいことは公式の利用規約などをご確認ください。
+Hugo とは markdownから静的ページを生成するツールです。
+https://gohugo.io/
+Hugoを選んだ理由は、markdownで書けるというのが一番の理由で、他はテーマが種類が豊富にありそうだったとか、Go製なので軽量＆速そうとか、そういう理由です。
+構成 要は公開したいファイルを &amp;lt;username&amp;gt;.github.io レポジトリに入れていけばいいんですが、せっかく作るので管理しやすい形にしたいです。
+Hugo自体のファイルや生成元のmarkdownを管理するレポジトリと、公開用のレポジトリ &amp;lt;username&amp;gt;.github.io と、２つ用意するのはどうかな、と考えていたところ同じような構成を紹介しているサイトを発見。
+https://www.ted027.com/post/hugo/#hugo
+（本当にこのサイトのまま作ったので、紹介したら終わりになってしまうのですが）
+以下のような構成で構築を進めます。
+─ blog (git repogitory) ├── public (git submodule &amp;lt;username.github.io&amp;gt;) ├── content # ブログ記事 │　└── post │　├── 2019112401_github_pages_and_hugo.md │　├── 2019112501_other_post.md │　: ├── themas # 選択したテーマ ├── archetypes # 新しく記事を作ったときのテンプレート置き場 └── config.toml # 設定ファイル 導入 動作環境
+Ubuntu 18.04 LTS Hugo のセットアップ aptとかでインストールしてもいいんですが、最新版をいつでも使えるようにここではGitHubから取得する方法にします。</description>
+    </item>
+    
+  </channel>
+</rss>

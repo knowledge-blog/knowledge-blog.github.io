@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>GitHub Pages と Hugo でブログを書く</title>
+        
+        <style>
+
+    html body {
+        font-family: 'Raleway', sans-serif;
+        background-color: whitesmoke;
+    }
+
+    :root {
+        --accent: tomato;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://3nan3.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.61.0" />
+        
+
+        
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154155171-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments)};
+              gtag('js', new Date());
+              gtag('config', 'UA-154155171-1');
+            </script>
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">GitHub Pages と Hugo でブログを書く</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                        </ul>
+                    
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/3nan3/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/the_three/"><i class="fa fa-twitter"></i></a></li>
+                            
+                        </ul>
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>GitHub Pages と Hugo でブログを書く</h2>
+        <h5>November 24, 2019</h5>
+        
+<a href="https://3nan3.github.io/tags/github-pages"><kbd class="item-tag">Github Pages</kbd></a>
+
+<a href="https://3nan3.github.io/tags/hugo"><kbd class="item-tag">Hugo</kbd></a>
+
+
+    </div>
+
+    <div align="start" class="content"><h1 id="heading">はじめに</h1>
+<p>今までブログとか持ってなかったので何か欲しかったんですよね。<br>
+ブログサービスとか色々あるんですけど、GitHubに静的なページおいて公開できる機能あったことを思い出して使ってみることにしました。</p>
+<p>今回は、そのビルドログということで記録を残しておきます。<br>
+ブログなので文量多めです。</p>
+<h3 id="github-pages-">GitHub Pages とは</h3>
+<p>簡単に言うと、GitHubに <code>&lt;username&gt;.github.io</code> という名前のレポジトリを作ると、Webページとして公開してくれるサービスです。
+構成とかデプロイとか何にも考えなくて良いので楽ちん。<br>
+<a href="https://help.github.com/ja/github/working-with-github-pages">https://help.github.com/ja/github/working-with-github-pages</a></p>
+<p>商用利用禁止であったり、アクセス数の制限があったり、その辺りの細かいことは公式の利用規約などをご確認ください。</p>
+<h3 id="hugo-">Hugo とは</h3>
+<p>markdownから静的ページを生成するツールです。<br>
+<a href="https://gohugo.io/">https://gohugo.io/</a></p>
+<p>Hugoを選んだ理由は、markdownで書けるというのが一番の理由で、他はテーマが種類が豊富にありそうだったとか、Go製なので軽量＆速そうとか、そういう理由です。</p>
+<h1 id="heading-1">構成</h1>
+<p>要は公開したいファイルを <code>&lt;username&gt;.github.io</code> レポジトリに入れていけばいいんですが、せっかく作るので管理しやすい形にしたいです。<br>
+Hugo自体のファイルや生成元のmarkdownを管理するレポジトリと、公開用のレポジトリ <code>&lt;username&gt;.github.io</code> と、２つ用意するのはどうかな、と考えていたところ同じような構成を紹介しているサイトを発見。<br>
+<a href="https://www.ted027.com/post/hugo/#hugo">https://www.ted027.com/post/hugo/#hugo</a></p>
+<p>（本当にこのサイトのまま作ったので、紹介したら終わりになってしまうのですが）<br>
+以下のような構成で構築を進めます。</p>
+<pre><code>─ blog (git repogitory)
+　　├── public (git submodule &lt;username.github.io&gt;)
+　　├── content # ブログ記事
+　　│　　 └── post
+　　│　　　　　├── 2019112401_github_pages_and_hugo.md
+　　│　　　　　├── 2019112501_other_post.md
+　　│　　　　　:
+　　├── themas      # 選択したテーマ
+　　├── archetypes  # 新しく記事を作ったときのテンプレート置き場
+　　└── config.toml # 設定ファイル
+</code></pre><h1 id="heading-2">導入</h1>
+<p>動作環境</p>
+<pre><code>Ubuntu 18.04 LTS
+</code></pre><h3 id="hugo--1">Hugo のセットアップ</h3>
+<p>aptとかでインストールしてもいいんですが、最新版をいつでも使えるようにここではGitHubから取得する方法にします。</p>
+<p>まず事前準備として、Go言語のインストールをしておきましょう。<br>
+バージョンは、導入時に最新のstableをインストールしています。<br>
+<a href="https://golang.org/doc/install#install">https://golang.org/doc/install#install</a></p>
+<pre><code># Goのインストール
+wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.13.4.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin:~/go/bin # あとは各自bash.profileなどを設定
+</code></pre><p>インストールが成功したか確認します</p>
+<pre><code>&gt; go version
+go version go1.13.4 linux/amd64
+</code></pre><p>次に、Hugoをインストールします。<br>
+GitHubから取得するので <code>git clone</code> 使ってもいいのですが、ここは <code>go get</code> を使って配置とビルドまでやってもらいます。<br>
+<a href="https://github.com/gohugoio/hugo#fetch-from-github">https://github.com/gohugoio/hugo#fetch-from-github</a></p>
+<pre><code># Hugoのインストール
+go get github.com/gohugoio/hugo.git
+</code></pre><p>こちらも、インストールが成功したか確認しておきます</p>
+<pre><code>&gt; hugo version
+Hugo Static Site Generator v0.60.0-DEV linux/amd64 BuildDate: unknown
+</code></pre><h3 id="heading-3">プロジェクトの作成</h3>
+<p>まずは、Hugoで新しくサイトを作ります。</p>
+<pre><code>hugo new site blog
+cd blog
+</code></pre><p>次に、テーマを設定します。<br>
+テーマはこちらに一覧があるので、好きなものを選択します。<br>
+<a href="https://themes.gohugo.io/">https://themes.gohugo.io/</a></p>
+<p>今回は、 <code>minimal</code> というテーマを選択しました。</p>
+<p><img src="https://user-images.githubusercontent.com/11911806/69903213-16878580-13da-11ea-99a9-820c7c4bcbab.png" alt="screenshot-minimal"></p>
+<pre><code>cd themes
+git clone https://github.com/minimal.git
+cd ../
+</code></pre><p>あとは、必要に応じて<code>config.toml</code>を更新します。
+テーマごとに設定項目が違ったりするので、選択したテーマの公式ページを参考に編集してください。</p>
+<pre><code>&gt; cat config.toml
+baseURL = &quot;http://3nan3.github.io/&quot;
+languageCode = &quot;ja&quot;
+title = &quot;ブログタイトル（仮）&quot;
+theme = &quot;minimal&quot;
+disqusShortname = &quot;&quot;
+googleAnalytics = &quot;&quot;
+...
+</code></pre><h3 id="heading-4">記事の作成</h3>
+<p>記事を追加するときは、</p>
+<pre><code>hugo new post/2019112401_title.md
+</code></pre><p>これで新規の記事が作成されます。</p>
+<pre><code>&gt; cat content/post/2019112401_title.md
+---
+title: &quot;2019112401_title&quot;
+date: 2019-11-24
+tags: []
+draft: true
+---
+</code></pre><p>本当はファイル名とタイトルは違うものを設定したいとか、整理してディレクトリ構造とかきれいにしたいとかやりたいですが、一旦ここは初期設定のまま行きます。<br>
+おそらく、<code>archetypes/default.md</code>でフォーマットを変更できるので、いずれチャレンジします。</p>
+<p>そして、このファイルにmarkdown形式で内容を書き込んで記事を作っていきます。</p>
+<p>あとは、ローカルサーバで動作を確認します。</p>
+<pre><code>hugo server --buildDrafts --watch # hugo server -wD でもOK
+</code></pre><p><code>--buildDrafts</code> は、draft: trueとなっている記事もビルドして一覧に表示されるようになるオプションです。書きかけの記事をローカルで確認するための機能でしょうか。<br>
+<code>--watch</code>は、特定のディレクトリを監視して変更があれば即ビルドするためのオプションです。</p>
+<p>記事が完成したら、<code>draft: false</code>に変更してビルドします。</p>
+<pre><code>hugo
+</code></pre><p>サブコマンド無しでビルドなんですね。あんまり馴染みがないので少し驚きました。<br>
+これで<code>public</code>フォルダが出来上がったと思います。</p>
+<h3 id="github-pages--1">GitHub Pages のセットアップ</h3>
+<p>まずは、レポジトリを作成しましょう</p>
+<ul>
+<li><code>&lt;username&gt;.github.io</code></li>
+<li><code>blog</code></li>
+</ul>
+<p><code>&lt;username&gt;</code>は、ご自身のGitHubアカウント名を入れてください。<br>
+<code>blog</code>は名前なんでもいいですが、ここではわかりやすく<code>blog</code>としています。</p>
+<p>まずはgitレポジトリの設定をしましょう。</p>
+<pre><code>git init
+git remote add origin git@github.com:&lt;username&gt;/blog.git
+</code></pre><p>そして、publicフォルダを<code>&lt;username&gt;.github.io</code>というレポジトリのサブモジュールとして登録します。</p>
+<pre><code>cd public
+git init
+git remote add origin git@github.com:&lt;username&gt;/&lt;username&gt;.github.io.git
+git push origin master
+cd ../
+git submodule add git@github.com:&lt;usernane&gt;/&lt;username&gt;.github.io.git public
+</code></pre><p>残りをaddして、GitHubにpushします。</p>
+<pre><code>git add -A
+git commit -m &quot;Initial commit&quot;
+git push origin master 
+</code></pre><p>あとは、<!-- raw HTML omitted -->.github.io で見られるようになっているはずなので確認してみましょう。<br>
+pushして直後に反映されるわけではないので、表示されない場合は少し待ちます。</p>
+<h3 id="heading-5">記事の追加</h3>
+<p>１つ記事が出来てしまえばあとは簡単で、</p>
+<ul>
+<li><code>hugo new post/2019012301_title.md</code> で記事を新規作成</li>
+<li>記事を編集してローカルで確認</li>
+<li>完成したら<code>hugo</code>でビルドしたあとに GitHub へ push</li>
+</ul>
+<pre><code>hugo
+cd public
+git checkout master
+git add -A
+git commit -m &quot;Add post 2019123401_title&quot;
+git push origin master
+cd ../
+git add -p # 必要なものだけコミットしてください
+git push origin master
+</code></pre><p>これで更新が出来ます。</p>
+<h1 id="heading-6">感想</h1>
+<p>コンソール上から簡単にブログが書けるようになりそうで個人的には大変満足です。ただ、記事の更新で思ったよりコマンド叩かなければいけなさそうなのでその辺はもっと改良したいところ（GitHub Pagesはmasterブランチを公開するんですが、git submoduleはHash管理なので同期が難しいですね）。<br>
+多分、更新頻度は数カ月に1回とかになりそうですが、何かまたネタが思いついたら書いてみようと思います。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+        <h4 class="page-header">Comments</h4>
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "3nan3-github-io" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>GitHub Actions で別のリポジトリに git push する</title>
+        
+        <style>
+
+    html body {
+        font-family: 'Raleway', sans-serif;
+        background-color: whitesmoke;
+    }
+
+    :root {
+        --accent: tomato;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://3nan3.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.61.0" />
+        
+
+        
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154155171-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments)};
+              gtag('js', new Date());
+              gtag('config', 'UA-154155171-1');
+            </script>
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">GitHub Actions で別のリポジトリに git push する</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                        </ul>
+                    
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/3nan3/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/the_three/"><i class="fa fa-twitter"></i></a></li>
+                            
+                        </ul>
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>GitHub Actions で別のリポジトリに git push する</h2>
+        <h5>December 22, 2019</h5>
+        
+<a href="https://3nan3.github.io/tags/github-actions"><kbd class="item-tag">GitHub Actions</kbd></a>
+
+<a href="https://3nan3.github.io/tags/github"><kbd class="item-tag">GitHub</kbd></a>
+
+<a href="https://3nan3.github.io/tags/ci"><kbd class="item-tag">CI</kbd></a>
+
+
+    </div>
+
+    <div align="start" class="content"><h1 id="heading">はじめに</h1>
+<p>GitHubに新しく <code>GitHub Actions</code> というものがリリースされました。いつもはCircle CIを使っていたのですが、試しに使ってみようということで軽く触ってみました。<br>
+このブログは先日作ったばかりなのですが、その時に「ブログ管理用レポジトリにmargeされたら、静的ページをビルドして、ブログ公開用レポジトリにpushする」という機能をあとでやる(<a href="/post/2019112401_github_pages_and_hugo/#%E6%84%9F%E6%83%B3">※</a>)って言っていたので、これをサンプルとして作ってみようと思います。</p>
+<h1 id="tldr">tl;dr</h1>
+<ul>
+<li>push先のレポジトリで、Settingsから <code>Deploy keys</code> （公開鍵）を登録</li>
+<li>GitHub Actionsを設定するレポジトリで、Settingsの <code>Secrets</code> にDeploy keysに対応するの秘密鍵を登録</li>
+<li>GitHub Actions用のymlをいい感じに書いてpushする</li>
+</ul>
+<h1 id="heading-1">やってみる</h1>
+<p>CI的なところはだいたい何ができるか想像つくんですけど、レポジトリ間の認証どうするのかと思って調べてみましたが、特段用意されてるわけではなさそうですね、知ってました。
+自分自身のレポジトリに対する認証用に <code>GITHUB_TOKEN</code> というものが勝手に追加される程度でした。
+なので、いつも通りの認証方式を取ります。</p>
+<p>先に、レポジトリ構成を書いておきますと、 <code>blog</code> が <code>3nan3.github.io</code> をpublicというフォルダ名でsubmoduleとして持っています。
+なので、構図としては blog レポジトリが 3nan3.github.io レポジトリにpushする形になります。</p>
+<pre><code>─ blog (git repogitory blog)
+　　├── public (git submodule 3nan3.github.io)
+　　└── ... # 他いろんなファイル
+</code></pre><h3 id="deploy-keys">Deploy keys</h3>
+<p>GitHub Actionsを設定する前に、先に認証周りの設定を済ませておきます。<br>
+pushされる側のレポジトリで作業を進めます。</p>
+<p>GitHubのSettingsにある、<code>Deploy keys</code>を使います。
+これは、ユーザに紐付かない、設定したレポジトリにのみアクセスできる鍵を作成できる機能で、読み込み専用・読み書き可能などの権限設定をすることも可能です。
+今回のように、人ではないサービスなどが読み込んだり書き込んだりする時に適切な権限設定ができるのでとても便利です。
+サービスの規模などに合わせてどのように管理するべきか、みたいなものが公式のページに書かれているので、悩んだことがある方にはおすすめです。</p>
+<p><a href="https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys">https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys</a></p>
+<p>で、鍵の生成はコマンドで、</p>
+<pre><code>&gt; ssh-keygen -t ed25519
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/username/.ssh/id_ed25519): ./id_ed25519
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in ./id_ed25519.
+Your public key has been saved in ./id_ed25519.pub.
+The key fingerprint is:
+...
+</code></pre><p>そして、出来上がった鍵のうち公開鍵（今回の場合はid_ed25519.pub）の中身をDeploy keysに登録します。</p>
+<p>Settings -&gt; Deploy keys -&gt; Add deploy key の順に遷移して、管理できるようにいい感じのTitleと鍵の中身を入力します。
+あとは、今回はpushしたいので<code>Allow write access</code>にチェックを入れて、Add keyを押せば完了。</p>
+<p><img src="https://user-images.githubusercontent.com/11911806/71270587-4c92a680-2395-11ea-803b-16a3c2b8a023.png" alt="Screenshot from 2019-12-14 18-57-40-2"></p>
+<p><img src="https://user-images.githubusercontent.com/11911806/71270652-7946be00-2395-11ea-864c-e462d1741748.png" alt="Screenshot from 2019-12-14 18-56-43"></p>
+<p>これで、pushされる側の設定は終わりです。</p>
+<h3 id="secrets">Secrets</h3>
+<p>次に、GitHub Actions側の設定です。</p>
+<p>GitHub Actionsのリリースとともに、Settingsに <code>Secrets</code> という項目が増えました。
+何かと言うとそのまんま、秘匿情報を安全に保持して、GitHub Actions内から環境変数として使えるという機能です。
+ここに、先程Deploy keysに登録した鍵の秘密鍵の方を入れておけば、GitHub Actionsで認証を通すことが出来ます。
+注意点として、値にJsonとかは登録してはいけないとのこと（ログに残ってしまう可能性が出てくるらしい）。
+他、細かく注意点などが書かれているので、ドキュメントには目を通しておきましょう。</p>
+<p><a href="https://help.github.com/ja/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets">https://help.github.com/ja/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets</a></p>
+<p>で、先程コマンドで生成した鍵を登録すれば良いので、秘密鍵（今回の場合はid_ed25519）の中身をコピペします。
+Settings -&gt; Secrets -&gt; Add a secret の順に遷移して、環境変数名と鍵の中身を入力して Add secret を押します。</p>
+<p><img src="https://user-images.githubusercontent.com/11911806/71270664-806dcc00-2395-11ea-95d7-f74bc3cc8580.png" alt="Screenshot from 2019-12-14 19-15-48"></p>
+<h3 id="github-actions">GitHub Actions</h3>
+<p>最後に、GitHub Actionsを設定します。
+公式に詳細のドキュメントがあるので、これ見ながら書いていけば良いと思います。</p>
+<p><a href="https://help.github.com/ja/actions/automating-your-workflow-with-github-actions">https://help.github.com/ja/actions/automating-your-workflow-with-github-actions</a></p>
+<p>今回やりたいのは、</p>
+<ul>
+<li>自リポジトリのmasterブランチがpushされたら発火</li>
+<li>自リポジトリのmasterブランチで静的サイトをビルド</li>
+<li>ビルドされたものを別リポジトリのmasterブランチにcommit</li>
+<li>別リポジトリのmasterブランチをpush</li>
+</ul>
+<p>こんな流れ。
+で、出来上がったものがこちら。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#75715e"># .github/workflows/build_and_deploy.yml</span>
+name: Build and Deploy
+
+on:
+  push:
+    branches: master
+
+jobs:
+  build-and-deploy:
+    name: Build static pages and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Hugo
+        run: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">wget https://github.com/gohugoio/hugo/releases/download/v0.61.0/hugo_0.61.0_Linux-64bit.deb</span>
+          sudo dpkg -i hugo_0<span style="color:#ae81ff">.61</span>.0_Linux-64bit.deb
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        run: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">auth_header=&#34;$(git config --local --get http.https://github.com/.extraheader)&#34;</span>
+          git submodule sync --recursive
+          git -c <span style="color:#e6db74">&#34;http.extraheader=$auth_header&#34;</span> -c protocol.version=<span style="color:#ae81ff">2</span> submodule update --init --force --recursive --depth=<span style="color:#ae81ff">1</span>
+
+      - name: Setup git repogitories
+        env:
+          GITHUB_IO_REPO_DEPLOY_KEY: ${{ secrets.GITHUB_IO_REPO_DEPLOY_KEY }}
+        run: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">echo &#34;$GITHUB_IO_REPO_DEPLOY_KEY&#34; &gt; ~/deploy_key.pem</span>
+          chmod <span style="color:#ae81ff">600</span> ~/deploy_key.pem
+          git config --global user.email <span style="color:#e6db74">&#34;3nan3@github.io&#34;</span>
+          git config --global user.name <span style="color:#e6db74">&#34;3nan3&#34;</span>
+          cd public
+          git config remote.origin.url <span style="color:#e6db74">&#34;git@github.com:3nan3/3nan3.github.io.git&#34;</span>
+          git checkout master
+
+      - name: Build pages
+        run: hugo
+
+      - name: Deploy pages
+        env:
+          GIT_SSH_COMMAND: ssh -i ~/deploy_key.pem -o StrictHostKeyChecking=no -F /dev/<span style="color:#66d9ef">null</span>
+        run: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">cd public</span>
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m <span style="color:#e6db74">&#34;Deploy $GITHUB_SHA by GitHub Actions&#34;</span>
+            git pull origin master
+            git push origin master
+          fi
+
+      - name: Update dependency of submodule
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: <span style="color:#e6db74">|
+</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">git add public</span>
+          if ! git diff --cached --quiet; then
+            origin=https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/3nan3/blog.git
+            git commit -m <span style="color:#e6db74">&#34;Update dependency of submodule&#34;</span>
+            git pull $origin master
+            git push $origin master
+          fi
+<span style="color:#75715e"># refs</span>
+<span style="color:#75715e"># - actions/checkout@v2 and submodule update</span>
+<span style="color:#75715e">#   https://github.com/actions/checkout/tree/c85684db76ba6ef08713c10cf4befe3318887415#checkout-submodules</span>
+</code></pre></div><p>想定より記述量が多くなってしまいましたが、使い方はわかったので良しとします。
+それと、sshとかgit周りで思ったより躓いてしまって、結構大変でした。。。
+GitHub Actionsと全然関係ない話なので、やる気があったらまた後日別記事にでもまとめようかと思います。</p>
+<p>実行結果はと、Actionsタブで確認することが出来ます</p>
+<p><img src="https://user-images.githubusercontent.com/11911806/71270588-4d2b3d00-2395-11ea-96b7-531f03d66d47.png" alt="Screenshot from 2019-12-21 01-47-20"></p>
+<p><img src="https://user-images.githubusercontent.com/11911806/71270589-4d2b3d00-2395-11ea-8eb4-935d3132e8a1.png" alt="Screenshot from 2019-12-21 01-49-41"></p>
+<h1 id="heading-2">さいごに</h1>
+<p>Circle CIと違って簡単に結果画面に遷移できるのはやっぱり楽でいいですね。
+あと、無料でmacOS使えるのもすごい（無料だよね？あんまり調べてないけど）。
+AWSとかと連携するためのactionsも用意されているみたいなので、またの機会に試してみようかと思います。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+        <h4 class="page-header">Comments</h4>
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "3nan3-github-io" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+

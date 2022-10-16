@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Slack on nannannan</title>
+    <link>https://3nan3.github.io/tags/slack/</link>
+    <description>Recent content in Slack on nannannan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Thu, 27 Feb 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://3nan3.github.io/tags/slack/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Slack で slash command を使って interactive なやり取りをする</title>
+      <link>https://3nan3.github.io/post/2020022701_slack_bot/</link>
+      <pubDate>Thu, 27 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://3nan3.github.io/post/2020022701_slack_bot/</guid>
+      <description>ちょっと最近 bot さん使って業務を便利に出来ないかなーと思っていて、興味はあるものの一度も触ったことなかったのでいろいろ試してみたときの記録です。 先日の３連休で予定も特に無かったので（というか、コロナと花粉のせいで外に出たくなかったので）引きこもってずっと作業してました。 さくっと動作確認するつもりだったんですが、情報が古かったり（Slack APIの更新が早い？）して丸２日かかってしまい、せっかく頑張ったんだから久々に記事書くことにしました。
+LT;DR GitHub の方に設定方法とか書いたのでそちら見てください。言語はGoです。
+そして、ここより先の話はただの日記です 😄
+https://github.com/3nan3/go-slack-interactive
+はじめに いろんな記事漁ったんですけど、一番やりたいことに近かったのがメルカリさんの記事でした。 https://tech.mercari.com/entry/2017/05/23/095500
+bot に話しかけると、選択肢を提示して、その結果に応じてまた返答をする、というような bot です🍺。 GitHub にレポジトリが上がっていたのでそのまま動いてくれればよかったのですが、なんかよくわからないが動かない。 そもそも Slack bot に用意されている機能がたくさんあって、初めて触る私にはどれが何できるのかよく分からなくて時間かかってしまいました。 RTM API と Event API がある、ふむなるほど。 RTM API だとメンションに反応したり、slash commandが使えたり、Event APIはえーと何？ みたいな状態で、ほとんどが情報収集と整理に時間が費やされました。
+RTM API は衰退する？ Slack は今、色々変更しているタイミングのようで、レガシーと呼ばれるものが点在していました。 ２０１７年から２０１９年あたりの外部の記事を漁っていましたが、UI違ったり出来ることができなくなっていたり使わないように推奨されたり、 公式ドキュメントも、何が古くて何が新しいのかよく分からず、ずっと迷子だったような気がします。
+正確な情報か自信ないんですけど、今現在新しく発行したbot用のトークンは RTM API に使えないのだとか。 slack-go レポジトリの issue にコメントがあって、 そこで紹介していた公式ドキュメントによると、
+ Making API calls &amp;hellip;
+New bot user API access tokens may not access RTM. For most apps, the Events API lets your app listen to Slack goings-on in a more structured, safe way.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Slack で slash command を使って interactive なやり取りをする</title>
+        
+        <style>
+
+    html body {
+        font-family: 'Raleway', sans-serif;
+        background-color: whitesmoke;
+    }
+
+    :root {
+        --accent: tomato;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="https://3nan3.github.io/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>$(document).on('click', function() { $('.collapse').collapse('hide'); })</script>
+ <meta name="generator" content="Hugo 0.61.0" />
+        
+
+        
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154155171-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments)};
+              gtag('js', new Date());
+              gtag('config', 'UA-154155171-1');
+            </script>
+        
+
+        
+            <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+
+    </head>
+
+    <body>
+        
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand visible-xs" href="#">Slack で slash command を使って interactive なやり取りをする</a>
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse">
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                        </ul>
+                    
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/3nan3/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/the_three/"><i class="fa fa-twitter"></i></a></li>
+                            
+                        </ul>
+                    
+                </div>
+            </div>
+        </nav>
+
+
+<main>
+
+    <div>
+        <h2>Slack で slash command を使って interactive なやり取りをする</h2>
+        <h5>February 27, 2020</h5>
+        
+<a href="https://3nan3.github.io/tags/slack"><kbd class="item-tag">Slack</kbd></a>
+
+<a href="https://3nan3.github.io/tags/bot"><kbd class="item-tag">bot</kbd></a>
+
+<a href="https://3nan3.github.io/tags/golang"><kbd class="item-tag">Golang</kbd></a>
+
+
+    </div>
+
+    <div align="start" class="content"><p>ちょっと最近 bot さん使って業務を便利に出来ないかなーと思っていて、興味はあるものの一度も触ったことなかったのでいろいろ試してみたときの記録です。
+先日の３連休で予定も特に無かったので（というか、コロナと花粉のせいで外に出たくなかったので）引きこもってずっと作業してました。
+さくっと動作確認するつもりだったんですが、情報が古かったり（Slack APIの更新が早い？）して丸２日かかってしまい、せっかく頑張ったんだから久々に記事書くことにしました。</p>
+<h1 id="ltdr">LT;DR</h1>
+<p>GitHub の方に設定方法とか書いたのでそちら見てください。言語はGoです。<br>
+そして、ここより先の話はただの日記です 😄<br>
+<a href="https://github.com/3nan3/go-slack-interactive">https://github.com/3nan3/go-slack-interactive</a></p>
+<h1 id="heading">はじめに</h1>
+<p>いろんな記事漁ったんですけど、一番やりたいことに近かったのがメルカリさんの記事でした。
+<a href="https://tech.mercari.com/entry/2017/05/23/095500">https://tech.mercari.com/entry/2017/05/23/095500</a></p>
+<p>bot に話しかけると、選択肢を提示して、その結果に応じてまた返答をする、というような bot です🍺。
+GitHub にレポジトリが上がっていたのでそのまま動いてくれればよかったのですが、なんかよくわからないが動かない。
+そもそも Slack bot に用意されている機能がたくさんあって、初めて触る私にはどれが何できるのかよく分からなくて時間かかってしまいました。
+RTM API と Event API がある、ふむなるほど。
+RTM API だとメンションに反応したり、slash commandが使えたり、Event APIはえーと何？
+みたいな状態で、ほとんどが情報収集と整理に時間が費やされました。</p>
+<h1 id="rtm-api-">RTM API は衰退する？</h1>
+<p>Slack は今、色々変更しているタイミングのようで、レガシーと呼ばれるものが点在していました。
+２０１７年から２０１９年あたりの外部の記事を漁っていましたが、UI違ったり出来ることができなくなっていたり使わないように推奨されたり、
+公式ドキュメントも、何が古くて何が新しいのかよく分からず、ずっと迷子だったような気がします。</p>
+<p>正確な情報か自信ないんですけど、今現在新しく発行したbot用のトークンは RTM API に使えないのだとか。
+slack-go レポジトリの issue に<a href="https://github.com/slack-go/slack/issues/654#issuecomment-578946919">コメント</a>があって、
+そこで紹介していた<a href="https://api.slack.com/authentication/quickstart">公式ドキュメント</a>によると、</p>
+<blockquote>
+<h3 id="making-api-calls">Making API calls</h3>
+<p>&hellip;<br>
+New bot user API access tokens may not access RTM. For most apps, the Events API lets your app listen to Slack
+goings-on in a more structured, safe way. If you require access to RTM (say, because you're building your app behind
+a corporate firewall), continue to use a classic Slack app bot token to call rtm.connect.</p>
+</blockquote>
+<p>とのことでした。<br>
+しれっと RTM API も非推奨な感じで言ってるし（botトークンに限った話かも）、じゃあまあそのように作ってみるかということで、だいたい同じような動きをしつつ自分なりに書き直してみたのがこちらです。<br>
+<a href="https://github.com/3nan3/go-slack-interactive">https://github.com/3nan3/go-slack-interactive</a></p>
+<p>使い方みたいなのは全部 README.md に書いたのでそちら見てください。</p>
+<h1 id="heading-1">感想</h1>
+<p>個人的には、RTM API 使わなくなったので websocket 使わないで実現できるからむしろ楽になったかなーと言う気がします。楽と言うか馴染みがある、が近いかな。
+できればサーバレスにしたい、lambdaとか。</p>
+<p>あと、Attachment は古い？のかな、それとも今後も残るのかはちょっとわからないですけど、
+あたらしく Block というものが用意されているようなので、レスポンスをもうちょっとリッチにしてみたいなと思いました。</p>
+<p>今回触った部分に関しては知識が溜まったので、何かしらに活かしていきたいと思います。</p>
+</div>
+
+    
+    
+    
+
+    
+    
+        <h4 class="page-header">Comments</h4>
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "3nan3-github-io" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+</main>
+
+        <footer>
+            <p class="copyright text-muted">© All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+        </footer>
+
+        
+
+        
+    </body>
+
+</html>
+
